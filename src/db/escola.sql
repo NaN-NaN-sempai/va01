@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS Usuarios (
     nome_exib VARCHAR(255) NOT NULL,
     imagem_exib TEXT
 );
-
+ 
 /* Criação do Usuario Administrador */
 INSERT INTO Usuarios (tipo, login, senha, nome_exib, imagem_exib)
 VALUES (
