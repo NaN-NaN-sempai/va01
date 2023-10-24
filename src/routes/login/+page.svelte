@@ -48,9 +48,12 @@
     </BlockPanel.Panel>
 </div>
 
-<div>
+<div class="login">
     <BlockPanel.Panel>
         <BlockPanel.Title> Bem vindo ao nosso Site </BlockPanel.Title> 
+
+        <br>
+        <br>
 
         Venha conhecer
         Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam ad nulla perspiciatis pariatur obcaecati quasi explicabo doloremque aperiam assumenda dolorum autem voluptatum consequuntur, itaque dignissimos eum exercitationem odio esse magni.
