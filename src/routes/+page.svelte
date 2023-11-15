@@ -172,4 +172,10 @@
         padding-left: 20px;
         padding-right: 20px;
     }
+    .ATVsucesso {
+        background-color: green;
+        padding: 20px;
+        border-radius: 20px;
+        margin-bottom: 20px;
+    }
 </style>

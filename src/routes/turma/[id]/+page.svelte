@@ -549,6 +549,8 @@
         padding: 20px;
         border-radius: 20px;
         margin-bottom: 20px;
+        color: #D9D9D9;
+        text-align-last: center;
     }
 
 
