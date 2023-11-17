@@ -6,6 +6,7 @@
 
     import BlockPanel from '$components/blockPanel/index.js'; 
     import gotoIf from '$src/lib/gotoIf.js';
+    import { parse } from 'svelte/compiler';
 
     export let data;
     let { turma, alunos, alunosDaTurma, professor, atividades, ALNsucesso, ATVsucesso, aluno_atividade } = data;
@@ -364,6 +365,43 @@
                     }} /> 
                 </div>
 
+
+                <input type="hidden" name="arquivo" id="arquivos">
+
+
+                <div class="input">
+                    <BlockPanel.Input title="arquivo" iptOptions={{
+                        type: "file",
+                        oninput: `
+                        let hiddenInput = document.querySelector("#arquivos");
+
+                        hiddenInput.value = "";
+
+                        function getBase64(file) {
+                            var reader = new FileReader();
+                            reader.readAsDataURL(file);
+                            reader.onload = function () {
+
+                                let temp = JSON.parse(hiddenInput.value || "[]");
+
+                                temp.push(reader.result);
+
+                                hiddenInput.value = JSON.stringify(temp);
+
+                                return console.log(JSON.parse(hiddenInput.value))
+                            };
+                            reader.onerror = function (error) {
+                                alert('Erro ao carregar arquivo: '+ error);
+                            };
+                        }
+
+                        Array.from(this.files).forEach(getBase64);
+                        `,
+                        multiple: "multiple",
+                        placeholder: "Digite o valor da atividade...",
+                    }} /> 
+                </div>
+
                 <div class="adicionar">
                     <BlockPanel.Button opcoesBotao={{value: "adicionar novo"}}></BlockPanel.Button>
                 </div>
@@ -388,6 +426,22 @@
             <div class="descricao" style="margin-bottom: 20px;">
                 {atividadeAberta.descricao}
             </div>
+
+            <h3>Arquivos:</h3>
+            <div class="arquivosList">
+                
+            {#if !JSON.parse(atividadeAberta.arquivo || "[]").length}
+                <span>Sem arquivos para essa atividade...</span>
+            {/if}
+
+            {#each JSON.parse(atividadeAberta.arquivo || "[]") as arquivos, index}
+
+                <a download="atividade_{atividadeAberta.titulo + "_arquivo_" + index}" title="atividade_{atividadeAberta.titulo + "_arquivo_" + index}" href="{arquivos}">{index}</a>
+
+            {/each}
+            </div>
+            <br>
+
             
             <h3>Usuarios que fizeram esta atividade:</h3>
             <div class="listaFeitos">
@@ -447,6 +501,24 @@
         padding: 20px;
     }
 
+
+    .arquivosList {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        align-items: center;
+
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    .arquivosList a {
+        background: #e7e7e7;
+        padding: 5px;
+        border-radius: 10px;        
+    }
+    .arquivosList a:hover {
+        background: #d9d9d9;
+    }
 
 
 

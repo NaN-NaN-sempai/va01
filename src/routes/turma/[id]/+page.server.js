@@ -108,20 +108,23 @@ export const actions = {
 	
 		var body = {};
 		valoresDoForm.forEach(function(value, key){
-			body[key] = value;
+            body[key] = value;
 		});
+
+        console.log(body.arquivo);
 
         if(body.operacao == "atividade"){
 
             if(body.acao == "post" ){
 
                 await query(`
-                    INSERT INTO Atividades (id_turma, valor, titulo, descricao)
+                    INSERT INTO Atividades (id_turma, valor, titulo, descricao, arquivo)
                     VALUES (
                         '${body.id_turma}',
                         '${body.valor}',
                         '${body.titulo}',
-                        '${body.descricao}'
+                        '${body.descricao}',
+                        '${body.arquivo}'
                     );
                 `);
                 

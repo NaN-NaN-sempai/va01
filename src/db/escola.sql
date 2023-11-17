@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS Atividades(
     id_turma INT NOT NULL,
     valor INT NOT NULL,
     titulo VARCHAR(255),
-    descricao TEXT
+    descricao TEXT,
+    arquivo LONGTEXT
 );
 
 
