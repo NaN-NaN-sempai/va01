@@ -56,6 +56,9 @@
     }
 
     const marcarFuncao = () => {
+        let inputHidden = document.querySelector("#arquivoAlunoHidden");
+        if(!inputHidden.value) return alert("Insira um arquivo!");
+        
         const input = (name, value) => {
             let input = document.createElement("input");
                 input.type = "hidden";
@@ -72,6 +75,8 @@
         input("operacao", "relacao");
         input("acao", "post");
 
+        input("arquivo", inputHidden.value);
+        
         input("id_aluno", usuario.id);
         input("atividade", JSON.stringify(atividadeAberta));
         input("usuario", JSON.stringify(usuario));
@@ -210,16 +215,16 @@
                     
                     <div class="atividadeLista">
                         {#each atividades as atividade}
-                                <div class="atividadeItem {checarAtividadeFeita(atividade)? "feito": ""}" aria-hidden on:click|self={()=>mostrarAtividadeFuncao(atividade)}>
-                                        
-                                    <div class="foto"  style="--foto: url(https://static.vecteezy.com/system/resources/previews/002/219/582/non_2x/illustration-of-book-icon-free-vector.jpg)" />
+                            <div class="atividadeItem {checarAtividadeFeita(atividade)? "feito": ""}" aria-hidden on:click|self={()=>mostrarAtividadeFuncao(atividade)}>
+                                    
+                                <div class="foto"  style="--foto: url(https://static.vecteezy.com/system/resources/previews/002/219/582/non_2x/illustration-of-book-icon-free-vector.jpg)" />
 
-                                    <h2 class="nome"> {atividade.titulo} ({atividade.valor}) </h2>
+                                <h2 class="nome"> {atividade.titulo} ({atividade.valor}) </h2>
 
-                                    {#if ["admin", "professor"].includes(usuario.tipo)}
-                                        <buttons aria-hidden on:click|self={()=>removerAtividade(atividade)} class="remover">REMOVER</buttons>
-                                    {/if}
-                                </div>
+                                {#if ["admin", "professor"].includes(usuario.tipo)}
+                                    <buttons aria-hidden on:click|self={()=>removerAtividade(atividade)} class="remover">REMOVER</buttons>
+                                {/if}
+                            </div>
                         {:else}
                             <div class="vazio">
                                 <h3> Sem Atividades por enquanto... </h3> 
@@ -384,7 +389,10 @@
 
                                 let temp = JSON.parse(hiddenInput.value || "[]");
 
-                                temp.push(reader.result);
+                                temp.push({
+                                    nome: file.name,
+                                    arquivo: reader.result
+                                });
 
                                 hiddenInput.value = JSON.stringify(temp);
 
@@ -432,13 +440,17 @@
                 
             {#if !JSON.parse(atividadeAberta.arquivo || "[]").length}
                 <span>Sem arquivos para essa atividade...</span>
+            
+            {:else}
+            
+                {#each JSON.parse(atividadeAberta.arquivo || "[]") as arquivo, index}
+
+                    <a download="{arquivo.nome}" title="{arquivo.nome}" href="{arquivo.arquivo}">{arquivo.nome}</a>
+
+                {/each}
+
             {/if}
 
-            {#each JSON.parse(atividadeAberta.arquivo || "[]") as arquivos, index}
-
-                <a download="atividade_{atividadeAberta.titulo + "_arquivo_" + index}" title="atividade_{atividadeAberta.titulo + "_arquivo_" + index}" href="{arquivos}">{index}</a>
-
-            {/each}
             </div>
             <br>
 
@@ -446,22 +458,21 @@
             <h3>Usuarios que fizeram esta atividade:</h3>
             <div class="listaFeitos">
             {#each atividadeAberta.feitos as feito}
-            {#if feito}
+                <a download="{JSON.parse(feito.arquivo).nome}" href="{JSON.parse(feito.arquivo).file}" class="feitoItem">
 
-                <div class="feitoItem">
-                    <div class="foto" style="--foto: url({feito.imagem_exib})" />
-                    <span class="nome">{feito.nome_exib}</span>
+                {#if feito}
 
-                </div>
-            {:else}
+                        <div class="foto" style="--foto: url({feito.imagem_exib})" />
+                        <span class="nome">{feito.nome_exib}</span>
 
-                <div class="feitoItem">
-                    <div class="foto" style="--foto: url(https://cdn-icons-png.flaticon.com/512/1828/1828843.png)" />
-                    <span class="nome"> REMOVIDO  </span>
+                {:else}
 
-                </div>
-            {/if}
+                        <div class="foto" style="--foto: url(https://cdn-icons-png.flaticon.com/512/1828/1828843.png)" />
+                        <span class="nome"> REMOVIDO  </span>
 
+                {/if}
+
+                </a>
             {:else}
                 <div class="feitoItem">
                     <span class="nome"> Ninguem fez essa atividade ainda...  </span>
@@ -471,12 +482,50 @@
 
             <br>
             <br>
-            
 
             {#if usuario.tipo != "professor"}
                 <div class="adicionar" style="text-align: center;">
                     
                     {#if !checarAtividadeFeita(atividadeAberta)}
+            
+                        <h3 style="text-align: left;">Envie sua atividade:</h3>
+
+                        <input type="hidden" name="arquivo" id="arquivoAlunoHidden">
+                        
+                        <div class="input">
+                            <BlockPanel.Input title="Insira um arquivo" iptOptions={{
+                                type: "file",
+                                id: "arquivoAluno",
+                                oninput: ` 
+                                let hiddenInput = document.querySelector("#arquivoAlunoHidden");
+
+                                hiddenInput.value = "";
+
+                                function getBase64(file) {
+                                    var reader = new FileReader();
+                                    reader.readAsDataURL(file);
+
+                                    reader.onload = function () {
+                                        hiddenInput.value = JSON.stringify({
+                                            nome: file.name,
+                                            file: reader.result
+                                        });
+
+                                        return console.log(JSON.parse(hiddenInput.value))
+                                    };
+                                    reader.onerror = function (error) {
+                                        alert('Erro ao carregar arquivo: '+ error);
+                                    };
+                                }
+
+                                Array.from(this.files).forEach(getBase64);
+                                `,
+                                placeholder: "Digite o valor da atividade...",
+                            }} /> 
+                        </div>
+
+                        <br>
+
                         <BlockPanel.Button 
                             onClick={()=>marcarFuncao()}
                             opcoesBotao={{value: "marcar como feito"}}></BlockPanel.Button>
@@ -599,6 +648,12 @@
         padding: 10px;
         display: flex;
         align-items: center;
+        text-decoration: none;
+        color: black;
+    }
+    
+    .listaFeitos .feitoItem:hover {
+        background: #898989;        
     }
 
     .listaFeitos .feitoItem .nome {

@@ -61,6 +61,7 @@ export async function load({url, params, cookies}) {
 
     for(let atividade of atividades){
         atividade.feitos = [];
+        //atividade.arquivo = [];
 
         let relacoes = await query(`
             SELECT *
@@ -68,7 +69,7 @@ export async function load({url, params, cookies}) {
             WHERE id_atividade = '${atividade.id}'
         `);
 
-        for(let relacao of relacoes){
+        for(let relacao of relacoes){   
             let aluno = (await query(`
                 SELECT *
                 FROM Usuarios
@@ -79,6 +80,7 @@ export async function load({url, params, cookies}) {
                 aluno.senha = null;
             }
     
+            aluno.arquivo = relacao.arquivo;
             atividade.feitos.push(aluno);
         }
     }
@@ -110,8 +112,6 @@ export const actions = {
 		valoresDoForm.forEach(function(value, key){
             body[key] = value;
 		});
-
-        console.log(body.arquivo);
 
         if(body.operacao == "atividade"){
 
@@ -148,10 +148,11 @@ export const actions = {
                 body.usuario = JSON.parse(body.usuario);
                 
                 await query(`
-                    INSERT INTO ${" `Aluno-Atividade`"} (id_aluno, id_atividade)
+                    INSERT INTO ${" `Aluno-Atividade`"} (id_aluno, id_atividade, arquivo)
                     VALUES (
                         '${body.usuario.id}',
-                        '${body.atividade.id}'
+                        '${body.atividade.id}',
+                        '${body.arquivo}'
                     );
                 `);
 

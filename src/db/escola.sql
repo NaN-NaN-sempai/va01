@@ -45,7 +45,8 @@ CREATE TABLE IF NOT EXISTS `Aluno-Turma` (
 
 CREATE TABLE IF NOT EXISTS `Aluno-Atividade` (
     id_aluno INT,
-    id_atividade INT
+    id_atividade INT,
+    arquivo LONGTEXT
 );
 
 --@block
